@@ -1,0 +1,3 @@
+ruff
+pytest-cov
+flake8
