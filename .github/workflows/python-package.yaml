@@ -31,12 +31,10 @@ jobs:
         make venv_dev
     - name: Lint with Ruff
       run: |
-        ruff check ./
+        make lint
     - name: Test with pytest
       run: |
         make test
-        coverage json --data-file .coverage -o buf/tests/coverage.json
-        coverage report --data-file .coverage
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
       env:
