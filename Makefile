@@ -14,3 +14,6 @@ test:
 
 lint:
 	.venv/bin/python3 -m ruff check ./
+	
+run:
+	.venv/bin/python3 -m fastapi run app/app.py
