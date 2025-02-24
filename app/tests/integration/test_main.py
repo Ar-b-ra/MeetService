@@ -27,7 +27,7 @@ def test_get_task_status(test_client, fake_redis):
     status_response = test_client.get(f"/task/{task_id}/")
     assert status_response.status_code == status.HTTP_200_OK
     status_data = status_response.json()
-    assert status_data["status"] == Statuses.RUN
+    assert status_data["status"] == Statuses.IN_QUEUE
 
 
 def test_get_task_status_not_found(test_client):

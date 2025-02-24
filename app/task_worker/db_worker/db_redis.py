@@ -1,7 +1,7 @@
 from datetime import datetime
-from fakeredis import FakeStrictRedis
+from fakeredis import FakeRedis
 
-from settings import TestState
+from settings import REDIS_SETTINGS, TestState
 from .db_base import DbBase
 from redis import Redis
 from task_worker.statuses import Statuses
@@ -9,7 +9,7 @@ from task_worker.statuses import Statuses
 
 class DbRedis(DbBase):
     def __init__(self, host, port, db, *, is_testing: False):
-        _redis = Redis if TestState.FALSE else FakeStrictRedis
+        _redis = Redis if REDIS_SETTINGS.is_testing == TestState.FALSE else FakeRedis
         self._client: Redis = _redis(host=host, port=port, db=db, decode_responses=True)
 
     async def get_task(self, task_id):
