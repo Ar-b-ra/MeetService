@@ -1,1 +1,4 @@
-fastapi
+fastapi[standard]
+redis
+pydantic-settings
+loguru
