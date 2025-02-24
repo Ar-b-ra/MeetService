@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     redis_db: int
     is_testing: TestState = TestState.FALSE
 
-    class Config:
+    class ConfigDict:
         env_file = ".env"
 
 
