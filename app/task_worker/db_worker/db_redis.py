@@ -9,7 +9,7 @@ class DbRedis(DbBase):
         self._client: Redis = Redis(host=host, port=port, db=db, decode_responses=True)
 
     async def get_task(self, task_id):
-        return await self._client.get(f"task:{task_id}")
+        return self._client.hgetall(f"task:{task_id}")
 
     async def create_task(self):
         create_time = datetime.now().isoformat()
@@ -21,9 +21,19 @@ class DbRedis(DbBase):
                 "status": Statuses.IN_QUEUE,
             },
         )
-        self._client.rpush("task_queue", task_id)
-
         return task_id
 
-    async def update_task(self, task_id: int):
-        pass
+    async def get_queued_tasks(self):
+        queued_tasks = []
+        async for task_id in self._client.smembers("task"):
+            task = await self.get_task(task_id)
+            if task["status"] == Statuses.IN_QUEUE:
+                queued_tasks.append(task)
+        return queued_tasks
+
+    async def update_task(self, task_id: int, data_to_update: dict):
+        task = await self.get_task(task_id)
+        if task is None:
+            raise ValueError(f"Task with id {task_id} not found")
+        task.update(data_to_update)
+        await self._client.hset(f"task:{task_id}", mapping=task)
