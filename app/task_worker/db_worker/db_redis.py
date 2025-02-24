@@ -36,4 +36,4 @@ class DbRedis(DbBase):
         if task is None:
             raise ValueError(f"Task with id {task_id} not found")
         task.update(data_to_update)
-        await self._client.hset(f"task:{task_id}", mapping=task)
+        self._client.hset(f"task:{task_id}", mapping=task)
