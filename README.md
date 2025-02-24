@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/Ar-b-ra/MeetService/branch/master/graph/badge.svg)](https://codecov.io/gh/Ar-b-ra/MeetService/)
+
 # Тестовое задание
 
 Необходимо реализовать прототип веб-сервиса по организации очереди задач. Допускается описать труднореализуемые или непонятные моменты алгоритмически.
