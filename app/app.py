@@ -1,23 +1,25 @@
-from fastapi import FastAPI, HTTPException, status
-
-from task_worker.db_worker.db_redis import DbRedis
+from fastapi import Depends, FastAPI, HTTPException, status
+from settings import REDIS_SETTINGS
 from task_worker.task_worker import TaskWorker
 from schemas.task import StatusResponse, CreateTaskResponse
-from settings import REDIS_SETTINGS
-
+from task_worker.db_worker.db_redis import DbRedis
 
 app = FastAPI()
-app.add_event_handler("startup", lambda: startup_event())
 
 
-def startup_event():
-    global task_worker
+def get_redis_client():
     redis_client = DbRedis(
         host=REDIS_SETTINGS.redis_host,
         port=REDIS_SETTINGS.redis_port,
         db=REDIS_SETTINGS.redis_db,
-    )  # TODO: make changable
-    task_worker = TaskWorker(redis_client)
+        is_testing=REDIS_SETTINGS.is_testing,
+    )
+    return redis_client
+
+
+def get_task_worker():
+    redis_client = get_redis_client()
+    return TaskWorker(redis_client)
 
 
 @app.post(
@@ -26,7 +28,9 @@ def startup_event():
     response_model=CreateTaskResponse,
     description="Creates task and return it's id",
 )
-async def create_task() -> int:
+async def create_task(
+    task_worker: TaskWorker = Depends(get_task_worker),
+) -> CreateTaskResponse:
     task_id = await task_worker.create_task()
     return CreateTaskResponse(task_id=task_id)
 
@@ -40,7 +44,9 @@ async def create_task() -> int:
     },
     description="Returns task by id",
 )
-async def get_task(task_id: int) -> StatusResponse:
+async def get_task(
+    task_id: int, task_worker: TaskWorker = Depends(get_task_worker)
+) -> StatusResponse:
     task = await task_worker.get_task(task_id)
     if task is None:
         raise HTTPException(

@@ -36,10 +36,8 @@ class TaskWorker:
                 "create_time": task["create_time"],
             }
             await self._task_db.update_task(task_id, dict_to_update)
-            # Имитация выполнения задачи
             execution_time = randint(0, 10)
             await asyncio.sleep(execution_time)
-            # Обновляем статус задачи на "Completed"
             dict_to_update["time_to_execute"] = (
                 datetime.now() - start_time
             ).total_seconds()
