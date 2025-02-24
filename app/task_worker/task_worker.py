@@ -20,14 +20,14 @@ class TaskWorker:
         logging.info(f"Task {task_id} created")
         return task_id
 
-    async def get_task(self, task_id: int) -> dict:
+    async def get_task(self, task_id: int) -> dict | None:
         return await self._task_db.get_task(task_id)
 
     async def get_queued_tasks(self) -> list[dict]:
         return await self._task_db.get_queued_tasks()
 
     async def _execute_task(self, task_id: int):
-        async with self._semaphore:
+        try:
             task = await self.get_task(task_id)
             start_time = datetime.now()
             dict_to_update = {
@@ -44,3 +44,6 @@ class TaskWorker:
             dict_to_update["status"] = Statuses.COMPLETED
             await self._task_db.update_task(task_id, dict_to_update)
             logging.info(f"Task {task_id} completed in {execution_time} seconds")
+        finally:
+            self._running_tasks.pop(task_id, None)
+            self._semaphore.release()  # Освобождаем семафор после завершения задачи
