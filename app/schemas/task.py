@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
-from .statuses import Statuses
+from task_worker.statuses import Statuses
 
 
 class StatusResponse(BaseModel):
