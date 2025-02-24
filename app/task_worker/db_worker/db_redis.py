@@ -8,7 +8,7 @@ from task_worker.statuses import Statuses
 
 
 class DbRedis(DbBase):
-    def __init__(self, host, port, db, *, is_testing: False):
+    def __init__(self, host, port, db, *, is_testing: TestState = TestState.FALSE):
         _redis = Redis if REDIS_SETTINGS.is_testing == TestState.FALSE else FakeRedis
         self._client: Redis = _redis(host=host, port=port, db=db, decode_responses=True)
 
